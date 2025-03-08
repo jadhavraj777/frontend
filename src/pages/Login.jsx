@@ -9,13 +9,25 @@ const Login = ({ setIsLoggedIn }) => {
   const navigate = useNavigate();
 
   const handleLogin = async () => {
+    const trimmedEmail = email.trim();
+    const trimmedPassword = password.trim();
+
+    if (!trimmedEmail || !trimmedPassword) {
+      alert("Email and password are required!");
+      return;
+    }
+
     try {
-      const res = await axios.post("http://localhost:5000/login", { email, password });
+      const res = await axios.post("http://localhost:4000/login", {
+        email: trimmedEmail,
+        password: trimmedPassword,
+      });
+
       localStorage.setItem("username", res.data.username);
       setIsLoggedIn(true);
       navigate("/home");
     } catch (error) {
-      alert("Invalid Credentials");
+      alert(error.response?.data?.message || "Invalid Credentials");
     }
   };
 
@@ -27,12 +39,14 @@ const Login = ({ setIsLoggedIn }) => {
           type="email"
           placeholder="Email"
           className="login-input"
+          value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
         <input
           type="password"
           placeholder="Password"
           className="login-input"
+          value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
         <button className="login-button" onClick={handleLogin}>

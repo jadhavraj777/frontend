@@ -10,13 +10,39 @@ const Register = ({ setIsLoggedIn }) => {
   const navigate = useNavigate();
 
   const handleRegister = async () => {
+    const trimmedUsername = username.trim();
+    const trimmedEmail = email.trim();
+    const trimmedPassword = password.trim();
+
+    // Validate input fields
+    if (!trimmedUsername || !trimmedEmail || !trimmedPassword) {
+      alert("All fields are required!");
+      return;
+    }
+
+    if (trimmedPassword.length < 6) {
+      alert("Password must be at least 6 characters long!");
+      return;
+    }
+
     try {
-      await axios.post("http://localhost:3000/register", { username, email, password });
-      localStorage.setItem("username", username);
+      // Send the registration request to the backend
+      await axios.post("http://localhost:4000/register", {
+        username: trimmedUsername,
+        email: trimmedEmail,
+        password: trimmedPassword,
+      });
+
+      // If successful, store username and log the user in
+      localStorage.setItem("username", trimmedUsername);
       setIsLoggedIn(true);
+
+      // Redirect to home page
       navigate("/home");
     } catch (error) {
-      alert("Registration failed. Please try again.");
+      // Display error message if registration fails
+      const errorMessage = error.response?.data?.message || "Registration failed. Please try again.";
+      alert(errorMessage);
     }
   };
 
@@ -28,18 +54,21 @@ const Register = ({ setIsLoggedIn }) => {
           type="text"
           placeholder="Username"
           className="register-input"
+          value={username}
           onChange={(e) => setUsername(e.target.value)}
         />
         <input
           type="email"
           placeholder="Email"
           className="register-input"
+          value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
         <input
           type="password"
-          placeholder="Password"
+          placeholder="Password (min 6 chars)"
           className="register-input"
+          value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
         <button className="register-button" onClick={handleRegister}>

@@ -1,10 +1,18 @@
 import React from "react";
+import { Link, useNavigate } from "react-router-dom";
 
-const Navbar = () => {
-  
+const Navbar = ({ isLoggedIn, setIsLoggedIn }) => {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("username"); // Clear username
+    setIsLoggedIn(false); // Update login state
+    navigate("/login"); // Redirect to login
+  };
+
   const styles = {
     navbar: {
-      backgroundColor: "#ff7f00", 
+      backgroundColor: "#ff7f00",
       padding: "10px",
     },
     navLink: {
@@ -13,9 +21,6 @@ const Navbar = () => {
       marginRight: "15px",
       transition: "0.3s ease-in-out",
       textDecoration: "none",
-    },
-    navLinkHover: {
-      color: "#ffd700", 
     },
     brand: {
       fontSize: "1.5rem",
@@ -33,11 +38,11 @@ const Navbar = () => {
       marginLeft: "10px",
     },
     loginBtn: {
-      backgroundColor: "#28a745", 
+      backgroundColor: "#28a745",
       color: "white",
     },
     registerBtn: {
-      backgroundColor: "#17a2b8", 
+      backgroundColor: "#17a2b8",
       color: "white",
     },
   };
@@ -60,50 +65,108 @@ const Navbar = () => {
 
         {/* Navbar Content */}
         <div className="collapse navbar-collapse" id="navbarTogglerDemo01">
-          <a className="navbar-brand" href="/Home" style={styles.brand}>BeChef!</a>
+          <Link className="navbar-brand" to="/home" style={styles.brand}>
+            BeChef!
+          </Link>
           <ul className="navbar-nav me-auto mb-2 mb-lg-0">
             <li className="nav-item">
-              <a className="nav-link" href="/Home" style={styles.navLink}>Home</a>
+              <Link className="nav-link" to="/home" style={styles.navLink}>
+                Home
+              </Link>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href="/About" style={styles.navLink}>About</a>
+              <Link className="nav-link" to="/about" style={styles.navLink}>
+                About
+              </Link>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href="/Contact" style={styles.navLink}>Contact Us</a>
+              <Link className="nav-link" to="/contact" style={styles.navLink}>
+                Contact Us
+              </Link>
             </li>
             <li className="nav-item">
-            <div class="dropdown">
-  <a class="btn btn-success dropdown-toggle" href="/categories" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-    Categories
-  </a>
-
-  <ul class="dropdown-menu">
-    <li><a class="dropdown-item" href="/South">South Indian Dishes</a></li>
-    <li><a class="dropdown-item" href="/Maharashtrian">Maharashtrian Dishes</a></li>
-    <li><a class="dropdown-item" href="/Italean">Italian Dishes </a></li>
-    <li><a class="dropdown-item" href="/Continental">Continental </a></li>
-    <li><a class="dropdown-item" href="/Punjabi">Punjabi Dishes </a></li>
-    <li><a class="dropdown-item" href="/Gujrati">Gujrati Dishes </a></li>
-    <li><a class="dropdown-item" href="/Rajasthani">Rajasthani Dishes</a></li>
-    <li><a class="dropdown-item" href="/Japanease">Japanease Dishes</a></li>
-    <li><a class="dropdown-item" href="/Korean">Korean Dishes</a></li>
-    <li><a class="dropdown-item" href="/North">North Indian Dishes</a></li>
-
-  </ul>
-</div>
+              <div className="dropdown">
+                <button
+                  className="btn btn-success dropdown-toggle rounded-pill"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
+                  Categories
+                </button>
+                <ul className="dropdown-menu">
+                  <li>
+                    <Link className="dropdown-item" to="/South">
+                      South Indian Dishes
+                    </Link>
+                  </li>
+                  <li>
+                    <Link className="dropdown-item" to="/Maharashtrian">
+                      Maharashtrian Dishes
+                    </Link>
+                  </li>
+                  <li>
+                    <Link className="dropdown-item" to="/Italian">
+                      Italian Dishes
+                    </Link>
+                  </li>
+                  <li>
+                    <Link className="dropdown-item" to="/Continental">
+                      Continental
+                    </Link>
+                  </li>
+                  <li>
+                    <Link className="dropdown-item" to="/Punjabi">
+                      Punjabi Dishes
+                    </Link>
+                  </li>
+                  <li>
+                    <Link className="dropdown-item" to="/Gujarati">
+                      Gujarati Dishes
+                    </Link>
+                  </li>
+                  <li>
+                    <Link className="dropdown-item" to="/Rajasthani">
+                      Rajasthani Dishes
+                    </Link>
+                  </li>
+                  <li>
+                    <Link className="dropdown-item" to="/Japanese">
+                      Japanese Dishes
+                    </Link>
+                  </li>
+                  <li>
+                    <Link className="dropdown-item" to="/Korean">
+                      Korean Dishes
+                    </Link>
+                  </li>
+                  <li>
+                    <Link className="dropdown-item" to="/North">
+                      North Indian Dishes
+                    </Link>
+                  </li>
+                </ul>
+              </div>
             </li>
-            
           </ul>
 
-          <form class="d-flex">
-        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"/>
-        <button class="btn btn-outline-success text-white" type="submit">Search</button>
-      </form>
+          
 
-          {/* Login/Register Buttons */}
+          {/* Login/Register or Logout Button */}
           <div className="d-flex">
-            <a href="/login" className="btn" style={{ ...styles.btn, ...styles.loginBtn }}>Login</a>
-            <a href="/register" className="btn" style={{ ...styles.btn, ...styles.registerBtn }}>Register</a>
+            {isLoggedIn ? (
+              <button className="btn btn-success ms-2 rounded-pill" onClick={handleLogout}>
+                Logout
+              </button>
+            ) : (
+              <>
+                <Link to="/login" className="btn" style={{ ...styles.btn, ...styles.loginBtn }}>
+                  Login
+                </Link>
+                <Link to="/register" className="btn" style={{ ...styles.btn, ...styles.registerBtn }}>
+                  Register
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </div>

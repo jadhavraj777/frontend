@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom"; // Import Link for navigation
 
 const Home = () => {
-  
+  const [recipes, setRecipes] = useState([]);
   const styles = {
     cardImage: {
       height: "200px", 
@@ -22,6 +23,24 @@ const Home = () => {
       textAlign: "center",
     },
   };
+
+  // Fetch recipes from the API when the component is mounted
+  useEffect(() => {
+    const fetchRecipes = async () => {
+      try {
+        const response = await fetch("http://localhost:4000/recipes"); // Replace with your API URL
+        if (response.ok) {
+          const data = await response.json();
+          setRecipes(data);
+        } else {
+          console.error("Failed to fetch recipes");
+        }
+      } catch (error) {
+        console.error("Error fetching recipes:", error);
+      }
+    };
+    fetchRecipes();
+  }, []);
 
   return (
     <div>
@@ -74,48 +93,31 @@ const Home = () => {
 
       {/* Card Section */}
       <div className="container mt-4">
-        <h2 style={styles.heading}>Choose From</h2>
-        <div className="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
-          {[
-            {
-              title: "Veg Recipes",
-              text: "Delicious vegetarian dishes to enjoy.",
-              img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRM6GqkqoZQnPrgajzmkAJx6xVpYNzI1SZ8iA&s",
-            },
-            {
-              title: "Non-Veg Recipes",
-              text: "Tasty non-vegetarian meals.",
-              img: "https://www.jaypeehotels.com/blog/wp-content/uploads/2024/04/BLOG-1-15.jpg",
-            },
-            {
-              title: "Desserts",
-              text: "Sweet treats for every occasion.",
-              img: "https://hips.hearstapps.com/hmg-prod/images/best-chocolate-desserts-recipes-peanut-butter-molten-chocolate-cakes-648c51a927c0a.jpg?crop=1xw:0.9989969909729187xh;center,top&resize=980:*",
-            },
-            {
-              title: "Drinks",
-              text: "Refreshing beverages for all seasons.",
-              img: "https://www.saveur.com/uploads/2007/02/SAVEUR_Mojito_1149-Edit-scaled.jpg?auto=webp&auto=webp&optimize=high&quality=70&width=1440",
-            },
-          ].map((card, index) => (
-            <div className="col" key={index}>
-              <div className="card h-100 shadow-sm border-0">
-                <img
-                  src={card.img}
-                  className="card-img-top"
-                  alt={card.title}
-                  style={styles.cardImage}
-                />
-                <div className="card-body" style={styles.cardBody}>
-                  <h5 className="card-title">{card.title}</h5>
-                  <p className="card-text">{card.text}</p>
-                  <a href="/readmore" className="btn btn-primary">
-                    Read More
-                  </a>
+      <h2 className="bg-success text-white rounded-pill" style={styles.heading}>Choose From</h2>
+      <div className="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+          {recipes.length === 0 ? (
+            <p>No recipes available yet!</p>
+          ) : (
+            recipes.map((recipe, index) => (
+              <div className="col" key={index}>
+                <div className="card h-100 shadow-sm border-0">
+                  <img
+                    src={`http://localhost:4000${recipe.image}`} // Make sure the image URL is correct
+                    className="card-img-top"
+                    alt={recipe.name}
+                    style={styles.cardImage}
+                  />
+                  <div className="card-body" style={styles.cardBody}>
+                    <h5 className="card-title">{recipe.name}</h5>
+                    <p className="card-text">{recipe.ingredients.join(", ")}</p>
+                    <Link to={`/recipes/${recipe._id}`} className="btn btn-success rounded-pill">
+                      Read More
+                    </Link>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
     </div>

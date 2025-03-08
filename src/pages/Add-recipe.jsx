@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios"; // Import axios for making API requests
 import "../App.css"; // Import CSS
 
 const AddRecipe = () => {
@@ -29,15 +30,11 @@ const AddRecipe = () => {
   };
 
   // Handle form submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     // Validate form inputs
-    if (
-      !recipe.name ||
-      !recipe.ingredients ||
-      !recipe.procedure
-    ) {
+    if (!recipe.name || !recipe.ingredients || !recipe.procedure) {
       alert("Please fill in all required fields.");
       return;
     }
@@ -50,39 +47,46 @@ const AddRecipe = () => {
     formData.append("procedure", recipe.procedure);
     formData.append("note", recipe.note);
 
-    // Save recipe to local storage (or send to an API)
-    const recipes = JSON.parse(localStorage.getItem("recipes")) || [];
-    recipes.push({
-      name: recipe.name,
-      image: recipe.image ? recipe.image.name : "", // Store image file name
-      ingredients: recipe.ingredients,
-      procedure: recipe.procedure,
-      note: recipe.note,
-    });
-    localStorage.setItem("recipes", JSON.stringify(recipes));
+    try {
+      // Send POST request to your backend API
+      const response = await axios.post(
+        "http://localhost:4000/add-recipe", // Adjusted endpoint
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
 
-    // Show success message
-    alert("Recipe added successfully!");
+      // Show success message if request is successful
+      if (response.status === 201) {
+        alert("Recipe added successfully!");
 
-    // Reset form
-    setRecipe({
-      name: "",
-      image: null,
-      ingredients: "",
-      procedure: "",
-      note: "",
-    });
+        // Reset form
+        setRecipe({
+          name: "",
+          image: null,
+          ingredients: "",
+          procedure: "",
+          note: "",
+        });
 
-    // Navigate to home page
-    navigate("/home");
+        // Navigate to the home page
+        navigate("/home");
+      }
+    } catch (error) {
+      // Handle error
+      console.error("Error adding recipe:", error);
+      alert("Error adding recipe. Please try again.");
+    }
   };
 
   return (
     <div className="add-recipe-container">
       <div className="add-recipe-box">
-        <h1 className="add-recipe-title">Add Your Recipe</h1>
+        <h1 className="add-recipe-title bg-success text-white rounded-pill">Add Your Recipe</h1>
         <form onSubmit={handleSubmit} className="add-recipe-form">
-          {/* Recipe Name */}
           <div className="form-group">
             <label htmlFor="name" className="form-label">
               Recipe Name <span className="required">*</span>
@@ -98,23 +102,17 @@ const AddRecipe = () => {
               required
             />
           </div>
-
-          {/* Image Upload */}
           <div className="form-group">
-            <label htmlFor="image" className="form-label">
-              Upload Image
-            </label>
+            <label htmlFor="image" className="form-label">Upload Image</label>
             <input
               type="file"
               id="image"
               name="image"
               className="form-input"
-              accept="image/*" 
+              accept="image/*"
               onChange={handleImageChange}
             />
           </div>
-
-          {/* Ingredients */}
           <div className="form-group">
             <label htmlFor="ingredients" className="form-label">
               Ingredients <span className="required">*</span>
@@ -123,14 +121,12 @@ const AddRecipe = () => {
               id="ingredients"
               name="ingredients"
               className="form-textarea"
-              placeholder="List ingredients (one per line)"
+              placeholder="List ingredients (comma-separated)"
               value={recipe.ingredients}
               onChange={handleInputChange}
               required
             />
           </div>
-
-          {/* Procedure */}
           <div className="form-group">
             <label htmlFor="procedure" className="form-label">
               Procedure <span className="required">*</span>
@@ -145,12 +141,8 @@ const AddRecipe = () => {
               required
             />
           </div>
-
-          {/* Note/Tip */}
           <div className="form-group">
-            <label htmlFor="note" className="form-label">
-              Note/Tip
-            </label>
+            <label htmlFor="note" className="form-label">Note/Tip</label>
             <textarea
               id="note"
               name="note"
@@ -160,9 +152,7 @@ const AddRecipe = () => {
               onChange={handleInputChange}
             />
           </div>
-
-          {/* Submit Button */}
-          <button type="submit" className="form-button">
+          <button type="submit" className="form-button btn-success rounded-pill">
             Add Recipe
           </button>
         </form>

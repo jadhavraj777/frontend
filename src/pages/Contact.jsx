@@ -5,14 +5,39 @@ const Contact = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission (e.g., send data to an API)
-    alert(`Thank you, ${name}! Your message has been sent.`);
-    setName("");
-    setEmail("");
-    setMessage("");
+    setLoading(true);
+    setError(null);
+    setSuccess(null);
+
+    try {
+      const response = await fetch("http://localhost:4000/contact", { // ✅ Fixed URL
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name, email, message }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to send message");
+      }
+
+      setSuccess("Thank you! Your message has been sent.");
+      setName("");
+      setEmail("");
+      setMessage("");
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -22,6 +47,8 @@ const Contact = () => {
         <p className="contact-text">
           Have questions or feedback? We'd love to hear from you! Fill out the form below, and we'll get back to you as soon as possible.
         </p>
+        {error && <p className="error-message">{error}</p>}
+        {success && <p className="success-message">{success}</p>}
         <form onSubmit={handleSubmit} className="contact-form">
           <div className="form-group">
             <label htmlFor="name" className="form-label">
@@ -64,8 +91,8 @@ const Contact = () => {
               required
             />
           </div>
-          <button type="submit" className="form-button">
-            Submit
+          <button type="submit" className="form-button" disabled={loading}>
+            {loading ? "Sending..." : "Submit"}
           </button>
         </form>
       </div>
